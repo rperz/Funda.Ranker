@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Funda.Ranker\Funda.Ranker.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="IoC\" />
+  </ItemGroup>
+
 </Project>

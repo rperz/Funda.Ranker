@@ -17,17 +17,21 @@ namespace Funda.Ranker
         private readonly ILogger _logger;
         private readonly HttpClient _client;
         private readonly string _baseUrl;
-        private const int MaxRetries = 10;
-        public FundaClient(ILogger logger)
+        private readonly int _maxRetries = 10;
+        private readonly int _sleepTime;
+
+        public FundaClient(ILogger logger, FundaConfiguration configuration)
         {
             _logger = logger;
-            _baseUrl = "http://partnerapi.funda.nl/feeds/Aanbod.svc/json/ac1b0b1572524640a0ecc54de453ea9f/?type=koop{0}&page={1}&pagesize={2}";
+            _maxRetries = configuration.MaxRetries;
+            _sleepTime = configuration.SleepTimeAfterExceedingRequestLimit;
+            _baseUrl = configuration.BaseUrl;
             _client = new HttpClient();
         }
 
-        public async Task<IEnumerable<ObjectForSale>> GetObjectsForSale(int pageNumber, int pageSize, int tryNumber = 1, params string[] searchTerms)
+        public async Task<PagedResult<IEnumerable<ObjectForSale>>> GetObjects(ListingType listingType, int pageNumber, int pageSize, int tryNumber = 1, params string[] searchTerms)
         {
-            if (tryNumber > MaxRetries)
+            if (tryNumber > _maxRetries)
             {
                 throw new RequestLimitExceededException();
             }
@@ -39,14 +43,14 @@ namespace Funda.Ranker
                 queryString = $"&zo=/{searchTermsAsQueryString}/";
             }
 
-            var requestUrl = string.Format(_baseUrl, queryString, pageNumber, pageSize);
+            var requestUrl = string.Format(_baseUrl, ListingTypeToTypeString(listingType), queryString, pageNumber, pageSize);
             var response = await _client.GetAsync(requestUrl);
 
             if (IsRequestLimitExceeded(response.StatusCode, response.ReasonPhrase))
             {
-                _logger.Info($"Request limit exceeded. Waiting for 5 seconds before trying again. Try number {tryNumber} of {MaxRetries}");
+                _logger.Info($"Request limit exceeded. Waiting for {_sleepTime / 1000} seconds before trying again. Try number {tryNumber} of {_maxRetries}");
                 Thread.Sleep(5000);
-                return await this.GetObjectsForSale(pageNumber, pageNumber, ++tryNumber, searchTerms).ConfigureAwait(false);
+                return await this.GetObjects(listingType, pageNumber, pageNumber, ++tryNumber, searchTerms).ConfigureAwait(false);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -56,13 +60,31 @@ namespace Funda.Ranker
 
             var content = await response.Content.ReadAsStringAsync();
             var fundaObjects = JsonConvert.DeserializeObject<FundaResultDTO>(content);
-            return fundaObjects.Objects.Select(o =>
-                new ObjectForSale(o.Id, o.Adres, new Realtor(o.MakelaarId, o.MakelaarNaam)));
+            return new PagedResult<IEnumerable<ObjectForSale>>()
+            {
+                CurrentPage = fundaObjects.Paging.HuidigePagina,
+                NumberOfPages = fundaObjects.Paging.AantalPaginas,
+                Result = fundaObjects.Objects.Select(o =>
+                    new ObjectForSale(o.Id, o.Adres, new Realtor(o.MakelaarId, o.MakelaarNaam)))
+            };
         }
 
         private bool IsRequestLimitExceeded(HttpStatusCode statusCode, string reason)
         {
             return statusCode == HttpStatusCode.Unauthorized && reason.Equals("Request limit exceeded");
+        }
+
+        private string ListingTypeToTypeString(ListingType type)
+        {
+            switch (type)
+            {
+                case ListingType.Rent:
+                    return "huur";
+                case ListingType.Sale:
+                    return "koop";
+                default: 
+                    throw new ArgumentException($"Unknown listingtype {type}");
+            }
         }
     }
 }

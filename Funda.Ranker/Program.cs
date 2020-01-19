@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Funda.Ranker.IoC;
 using Funda.Ranker.Services;
+using Microsoft.Extensions.Configuration;
+using SimpleInjector;
 
 namespace Funda.Ranker
 {
@@ -10,16 +14,20 @@ namespace Funda.Ranker
     {
         static async Task Main(string[] args)
         {
-            var realtorRanker = new SimpleRealtorRanker(new ObjectForSaleSErvice(new FundaClient(new ConsoleLogger())));
+
+            var container = new Container();
+            container.RegisterParallelRanker(25, 5000, "http://partnerapi.funda.nl/feeds/Aanbod.svc/json/ac1b0b1572524640a0ecc54de453ea9f/?type={0}{1}&page={2}&pagesize={3}", 20);
+
+            var realtorRanker = container.GetInstance<IRanker<Realtor, int>>();
 
             Console.WriteLine("Loading Top 10 Realtors (objects for sale)....");
-            var bestRealtorsWithObjectsForSale = await realtorRanker.GetRankedList("amsterdam");
+            var bestRealtorsWithObjectsForSale = await realtorRanker.GetRankedList(ListingType.Sale,"amsterdam");
 
             Console.WriteLine("Top 10 Realtors (objects for sale)");
             WriteResultToConsole(bestRealtorsWithObjectsForSale);
 
             Console.WriteLine("Loading Top 10 Realtors (objects with garden for sale)....");
-            var bestRealtorsWithObjectsForSaleWithGarden = await realtorRanker.GetRankedList("amsterdam", "tuin");
+            var bestRealtorsWithObjectsForSaleWithGarden = await realtorRanker.GetRankedList(ListingType.Sale,"amsterdam", "tuin");
             Console.WriteLine("Top 10 Realtors (objects with garden for sale)");
             WriteResultToConsole(bestRealtorsWithObjectsForSaleWithGarden);
 
