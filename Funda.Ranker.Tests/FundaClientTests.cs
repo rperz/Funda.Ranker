@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Funda.Ranker.Communication;
+using Funda.Ranker.Logging;
 using Moq;
 using NUnit.Framework;
 

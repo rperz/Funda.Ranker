@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Funda.Ranker.Models;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.Services
 {
     public interface IRanker<T1, T2>
     {

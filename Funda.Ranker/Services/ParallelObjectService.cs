@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Funda.Ranker.Communication;
 using Funda.Ranker.Models;
 
 namespace Funda.Ranker.Services
@@ -26,9 +27,13 @@ namespace Funda.Ranker.Services
             var pageNumber = 1;
             var pageSize = _configuration.PageSize;
             var objectsFromWebservice = await _client.GetObjects(type, pageNumber, pageSize, 1, searchTerms).ConfigureAwait(false);
-            Parallel.For(2, objectsFromWebservice.NumberOfPages,
-                (pageNumber) => AddPageToConcurrentBag(type, pageNumber, objects, searchTerms));
+            var tasks = new Task[objectsFromWebservice.NumberOfPages-1];
+            for (var i = 0; i < objectsFromWebservice.NumberOfPages - 1; i++)
+            {
+                tasks[i] = AddPageToConcurrentBag(type, i+1, objects, searchTerms);
+            }
 
+            await Task.WhenAll(tasks);
 
             return objects;
         }

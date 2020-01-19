@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Funda.Ranker.IoC;
+using Funda.Ranker.Models;
 using Funda.Ranker.Services;
 using Microsoft.Extensions.Configuration;
 using SimpleInjector;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.FileExtensions;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace Funda.Ranker
 {
@@ -14,27 +19,67 @@ namespace Funda.Ranker
     {
         static async Task Main(string[] args)
         {
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
 
-            var container = new Container();
-            container.RegisterParallelRanker(25, 5000, "http://partnerapi.funda.nl/feeds/Aanbod.svc/json/ac1b0b1572524640a0ecc54de453ea9f/?type={0}{1}&page={2}&pagesize={3}", 20);
+            if (!int.TryParse(config["pageSize"], out var pageSize))
+            {
+                Console.WriteLine("Pagesize is not a correct number");
+                Console.WriteLine("Press any key to exit..");
+                Console.ReadLine();
+                return;
+            }
 
-            var realtorRanker = container.GetInstance<IRanker<Realtor, int>>();
+            if (!int.TryParse(config["sleepTimeOnRequestLimitExceededInMilliSeconds"], out var sleepTime))
+            {
+                Console.WriteLine("sleepTimeOnRequestLimitExceededInMilliSeconds is not a correct integer");
+                Console.WriteLine("Press any key to exit..");
+                Console.ReadLine();
+                return;
+            }
 
-            Console.WriteLine("Loading Top 10 Realtors (objects for sale)....");
-            var bestRealtorsWithObjectsForSale = await realtorRanker.GetRankedList(ListingType.Sale,"amsterdam");
+            if (!int.TryParse(config["maxRetries"], out var maxRetries))
+            {
+                Console.WriteLine("maxRetries is not a correct integer");
+                Console.WriteLine("Press any key to exit..");
+                Console.ReadLine();
+                return;
+            }
 
-            Console.WriteLine("Top 10 Realtors (objects for sale)");
-            WriteResultToConsole(bestRealtorsWithObjectsForSale);
+            var baseUrl = config["baseUrl"];
 
-            Console.WriteLine("Loading Top 10 Realtors (objects with garden for sale)....");
-            var bestRealtorsWithObjectsForSaleWithGarden = await realtorRanker.GetRankedList(ListingType.Sale,"amsterdam", "tuin");
-            Console.WriteLine("Top 10 Realtors (objects with garden for sale)");
-            WriteResultToConsole(bestRealtorsWithObjectsForSaleWithGarden);
+            try
+            {
+                var container = new Container();
+                container.RegisterParallelRanker(pageSize, sleepTime, baseUrl, maxRetries);
 
-            Console.WriteLine("Press any key to exit");
-            Console.ReadLine();
+                var realtorRanker = container.GetInstance<IRanker<Realtor, int>>();
+
+                Console.WriteLine("Loading Top 10 Realtors (objects for sale)....");
+                var bestRealtorsWithObjectsForSale = await realtorRanker.GetRankedList(ListingType.Sale, "amsterdam");
+
+                Console.WriteLine("Top 10 Realtors (objects for sale)");
+                WriteResultToConsole(bestRealtorsWithObjectsForSale);
+
+                Console.WriteLine("Loading Top 10 Realtors (objects with garden for sale)....");
+                var bestRealtorsWithObjectsForSaleWithGarden =
+                    await realtorRanker.GetRankedList(ListingType.Sale, "amsterdam", "tuin");
+                Console.WriteLine("Top 10 Realtors (objects with garden for sale)");
+                WriteResultToConsole(bestRealtorsWithObjectsForSaleWithGarden);
+
+                Console.WriteLine("Press any key to exit");
+                Console.ReadLine();
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Unhandled Exception occured:");
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Press any key to exit..");
+                Console.ReadLine();
+            }
         }
-
 
         private static void WriteResultToConsole(IOrderedEnumerable<KeyValuePair<Realtor, int>> result)
         {

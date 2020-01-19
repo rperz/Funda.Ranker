@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Funda.Ranker.Services;
+using Funda.Ranker.Models;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.Services
 {
     public class SimpleRealtorRanker : IRanker<Realtor, int>
     {

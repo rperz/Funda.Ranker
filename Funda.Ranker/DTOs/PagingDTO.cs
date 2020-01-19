@@ -1,4 +1,4 @@
-﻿namespace Funda.Ranker
+﻿namespace Funda.Ranker.DTOs
 {
     public class PagingDTO
     {

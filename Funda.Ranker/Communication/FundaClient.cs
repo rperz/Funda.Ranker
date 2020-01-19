@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Funda.Ranker.DTOs;
+using Funda.Ranker.Exceptions;
+using Funda.Ranker.Logging;
 using Funda.Ranker.Models;
 using Newtonsoft.Json;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.Communication
 {
-    public class FundaClient
+    public class FundaClient : IFundaClient
     {
         private readonly ILogger _logger;
         private readonly HttpClient _client;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.Models
 {
     public class Realtor : IEquatable<Realtor>
     {
