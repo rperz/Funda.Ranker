@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.Logging
 {
     public class ConsoleLogger : ILogger
     {

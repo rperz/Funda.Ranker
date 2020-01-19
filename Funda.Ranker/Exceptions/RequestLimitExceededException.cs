@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.Exceptions
 {
     public class RequestLimitExceededException : Exception
     {

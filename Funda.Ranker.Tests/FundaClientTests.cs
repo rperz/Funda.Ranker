@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Funda.Ranker.Communication;
+using Funda.Ranker.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -14,9 +16,9 @@ namespace Funda.Ranker.Tests
         {
             var logger = new Mock<ILogger>();
             var sut = new FundaClient(logger.Object);
-            var result = await sut.GetObjectsForSale(1, 25, 1, "tuin", "amsterdam").ConfigureAwait(false);
+            var result = await sut.GetObjects(1, 25, 1, "tuin", "amsterdam").ConfigureAwait(false);
 
-            Assert.AreEqual(25, result.Count());
+            Assert.AreEqual(25, result.Result.Count());
         }
 
         [Test]
@@ -27,7 +29,7 @@ namespace Funda.Ranker.Tests
             var tasks = new Task[150];
             for (int i = 0; i < 150; i++)
             {
-                await sut.GetObjectsForSale(1, 25, 1, "tuin", "amsterdam").ConfigureAwait(false);
+                await sut.GetObjects(1, 25, 1, "tuin", "amsterdam").ConfigureAwait(false);
             }
         }
     }

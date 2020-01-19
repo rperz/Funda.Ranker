@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Funda.Ranker.Models
+namespace Funda.Ranker.DTOs
 {
     public class ObjectDTO
     {

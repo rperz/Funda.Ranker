@@ -4,8 +4,8 @@ using Funda.Ranker.Models;
 
 namespace Funda.Ranker.Services
 {
-    public interface IObjectForSaleService
+    public interface IObjectService
     {
-        Task<IEnumerable<ObjectForSale>> GetAllObjectsForSale(params string[] searchTerms);
+        Task<IEnumerable<ObjectForSale>> GetObjects(ListingType listingType, params string[] searchTerms);
     }
 }

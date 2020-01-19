@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Funda.Ranker.Models;
+﻿using System.Collections.Generic;
 
-namespace Funda.Ranker
+namespace Funda.Ranker.DTOs
 {
     public class FundaResultDTO
     {
         public List<ObjectDTO> Objects { get; set; } = new List<ObjectDTO>();
+        public PagingDTO Paging { get; set; }
     }
 }
