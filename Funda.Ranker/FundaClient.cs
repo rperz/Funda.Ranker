@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Funda.Ranker.Models;
 using Newtonsoft.Json;
 
 namespace Funda.Ranker
@@ -19,24 +21,32 @@ namespace Funda.Ranker
         public FundaClient(ILogger logger)
         {
             _logger = logger;
-            _baseUrl = "http://partnerapi.funda.nl/feeds/Aanbod.svc/json/ac1b0b1572524640a0ecc54de453ea9f/?type=koop&zo=/amsterdam/tuin/&page=1&pagesize=25";
+            _baseUrl = "http://partnerapi.funda.nl/feeds/Aanbod.svc/json/ac1b0b1572524640a0ecc54de453ea9f/?type=koop{0}&page={1}&pagesize={2}";
             _client = new HttpClient();
         }
 
-        public async Task<FundaResultDTO> GetObjectsForSale(int tryNumber = 1)
+        public async Task<IEnumerable<ObjectForSale>> GetObjectsForSale(int pageNumber, int pageSize, int tryNumber = 1, params string[] searchTerms)
         {
             if (tryNumber > MaxRetries)
             {
                 throw new RequestLimitExceededException();
             }
 
-            var response = await _client.GetAsync(_baseUrl);
+            var queryString = "";
+            if (searchTerms != null && searchTerms.Length > 0)
+            {
+                var searchTermsAsQueryString = string.Join('/', searchTerms);
+                queryString = $"&zo=/{searchTermsAsQueryString}/";
+            }
+
+            var requestUrl = string.Format(_baseUrl, queryString, pageNumber, pageSize);
+            var response = await _client.GetAsync(requestUrl);
 
             if (IsRequestLimitExceeded(response.StatusCode, response.ReasonPhrase))
             {
-                _logger.Info($"Request limit exceeded. Waiting for a minute before trying again. Try number {tryNumber} of {MaxRetries}");
-                Thread.Sleep(60000);
-                await this.GetObjectsForSale(tryNumber++).ConfigureAwait(false);
+                _logger.Info($"Request limit exceeded. Waiting for 5 seconds before trying again. Try number {tryNumber} of {MaxRetries}");
+                Thread.Sleep(5000);
+                return await this.GetObjectsForSale(pageNumber, pageNumber, ++tryNumber, searchTerms).ConfigureAwait(false);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -45,12 +55,14 @@ namespace Funda.Ranker
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<FundaResultDTO>(content);
+            var fundaObjects = JsonConvert.DeserializeObject<FundaResultDTO>(content);
+            return fundaObjects.Objects.Select(o =>
+                new ObjectForSale(o.Id, o.Adres, new Realtor(o.MakelaarId, o.MakelaarNaam)));
         }
 
         private bool IsRequestLimitExceeded(HttpStatusCode statusCode, string reason)
         {
-            return statusCode == HttpStatusCode.Unauthorized && reason.Equals("Request limit exceeded")
+            return statusCode == HttpStatusCode.Unauthorized && reason.Equals("Request limit exceeded");
         }
     }
 }

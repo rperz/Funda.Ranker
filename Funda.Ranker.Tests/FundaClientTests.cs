@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -13,20 +14,20 @@ namespace Funda.Ranker.Tests
         {
             var logger = new Mock<ILogger>();
             var sut = new FundaClient(logger.Object);
-            var result = await sut.GetObjectsForSale().ConfigureAwait(false);
+            var result = await sut.GetObjectsForSale(1, 25, 1, "tuin", "amsterdam").ConfigureAwait(false);
 
-            Assert.AreEqual(25, result.Objects.Count);
+            Assert.AreEqual(25, result.Count());
         }
 
         [Test]
-        public async Task GetObjectsForSaleShouldThrowExceptionWhenMoreThan100RequestsWithinAMinute()
+        public async Task GetObjectsForSaleShouldFinishAllRequestsThrowExceptionWhenMoreThan100RequestsWithinAMinute()
         {
             var logger = new Mock<ILogger>();
             var sut = new FundaClient(logger.Object);
             var tasks = new Task[150];
             for (int i = 0; i < 150; i++)
             {
-                await sut.GetObjectsForSale();
+                await sut.GetObjectsForSale(1, 25, 1, "tuin", "amsterdam").ConfigureAwait(false);
             }
         }
     }
