@@ -1,0 +1,13 @@
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Funda.Ranker.exe
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\obj\Debug\netcoreapp3.0\Funda.Ranker.csprojAssemblyReference.cache
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\obj\Debug\netcoreapp3.0\Funda.Ranker.AssemblyInfoInputs.cache
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\obj\Debug\netcoreapp3.0\Funda.Ranker.AssemblyInfo.cs
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Funda.Ranker.deps.json
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Funda.Ranker.runtimeconfig.json
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Funda.Ranker.runtimeconfig.dev.json
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Funda.Ranker.dll
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Funda.Ranker.pdb
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\bin\Debug\netcoreapp3.0\Newtonsoft.Json.dll
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\obj\Debug\netcoreapp3.0\Funda.Ranker.csproj.CopyComplete
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\obj\Debug\netcoreapp3.0\Funda.Ranker.dll
+C:\Users\Robin.MBS\source\repos\Funda.Ranker\Funda.Ranker\obj\Debug\netcoreapp3.0\Funda.Ranker.pdb
