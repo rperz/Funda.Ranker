@@ -23,9 +23,9 @@ namespace Funda.Ranker
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
 
-            if (!int.TryParse(config["pageSize"], out var pageSize))
+            if (!int.TryParse(config["pageSize"], out var pageSize) || pageSize <= 0)
             {
-                Console.WriteLine("Pagesize is not a correct number");
+                Console.WriteLine("Pagesize is not a correct number greater than zero");
                 Console.WriteLine("Press any key to exit..");
                 Console.ReadLine();
                 return;

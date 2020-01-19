@@ -27,13 +27,18 @@ namespace Funda.Ranker.Services
             var pageNumber = 1;
             var pageSize = _configuration.PageSize;
             var objectsFromWebservice = await _client.GetObjects(type, pageNumber, pageSize, 1, searchTerms).ConfigureAwait(false);
+            if (objectsFromWebservice.NumberOfPages <= 1)
+            {
+                return objectsFromWebservice.Result;
+            }
+
             var tasks = new Task[objectsFromWebservice.NumberOfPages-1];
             for (var i = 0; i < objectsFromWebservice.NumberOfPages - 1; i++)
             {
                 tasks[i] = AddPageToConcurrentBag(type, i+1, objects, searchTerms);
             }
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             return objects;
         }
