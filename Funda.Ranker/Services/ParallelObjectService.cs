@@ -11,11 +11,11 @@ namespace Funda.Ranker.Services
 {
     public class ParallelObjectService : IObjectService
     {
-        private readonly FundaClient _client;
+        private readonly IFundaClient _client;
         private readonly ServiceConfiguration _configuration;
         private readonly int _pageSize;
 
-        public ParallelObjectService(FundaClient client, ServiceConfiguration configuration)
+        public ParallelObjectService(IFundaClient client, ServiceConfiguration configuration)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));

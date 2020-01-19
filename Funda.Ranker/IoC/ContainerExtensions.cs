@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Funda.Ranker.Communication;
 using Funda.Ranker.Logging;
 using Funda.Ranker.Models;
 using Funda.Ranker.Services;
@@ -27,6 +28,7 @@ namespace Funda.Ranker.IoC
         {
             container.Register<IRanker<Realtor, int>, SimpleRealtorRanker>();
             container.Register<ILogger, ConsoleLogger>();
+            container.Register<IFundaClient, FundaClient>();
             container.Register(() => new FundaConfiguration() { BaseUrl = baseUrl, MaxRetries = maxRetries, SleepTimeAfterExceedingRequestLimit = sleepTimeOnRequestLimitExceededInMilliSeconds });
             container.Register(() => new ServiceConfiguration() { PageSize = pageSize });
         }
